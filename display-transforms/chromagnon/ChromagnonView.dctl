@@ -1,18 +1,17 @@
-#line 1 // Fix line numbers in resolve/logs/rollinglog.txt
-/*------------------------------------------------/
-    The Chromagnon View Transform
-    v0.0.7
+#line 2 // Fix line numbers in resolve/logs/rollinglog.txt
+// ------------------------------------------------
+//     The Chromagnon View Transform
+//     v0.0.7
     
-    Written by Jed Smith
-    https://github.com/jedypod/open-display-transform
+//     Written by Jed Smith
+//     https://github.com/jedypod/open-display-transform
 
-    License: GPL v3
-/*-------------------------------------------------*/
-
+//     License: GPL v3
+// -------------------------------------------------
 
 //////////////////////////////////////////////////////////////////////////////
 /* Parameters */
-DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 13, {i_xyz, i_ap0, i_ap1, i_p3d65, i_rec2020, i_rec709, i_awg3, i_awg4, i_rwg, i_sgamut3, i_sgamut3cine, i_bmdwg, i_egamut, i_davinciwg}, {XYZ, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, Sony SGamut3Cine, Blackmagic Wide Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
+DEFINE_UI_PARAMS(in_gamut, input gamut, DCTLUI_COMBO_BOX, 13, {i_xyz, i_ap0, i_ap1, i_p3d65, i_rec2020, i_rec709, i_awg3, i_awg4, i_rwg, i_sgamut3, i_sgamut3cine, i_bmdwg, i_cinegamut, i_egamut, i_davinciwg}, {XYZ, ACES 2065-1, ACEScg, P3D65, Rec.2020, Rec.709, Arri Wide Gamut 3, Arri Wide Gamut 4, Red Wide Gamut RGB, Sony SGamut3, Sony SGamut3Cine, Blackmagic Wide Gamut, Canon Cine Gamut, Filmlight E - Gamut, DaVinci Wide Gamut})
 // Tonescale
 DEFINE_UI_PARAMS(Lp, Lp, DCTLUI_SLIDER_FLOAT, 100.0, 100.0, 1000.0, 10.0)
 DEFINE_UI_PARAMS(Lg, Lg, DCTLUI_SLIDER_FLOAT, 10.0, 4.0, 20.0, 0.0)
@@ -63,6 +62,7 @@ DEFINE_UI_PARAMS(EOTF, display eotf, DCTLUI_COMBO_BOX, 2, {lin, srgb, rec1886, d
 #define matrix_bmdwg_to_xyz make_float3x3(make_float3(0.606538414955f, 0.220412746072f, 0.123504832387f), make_float3(0.267992943525f, 0.832748472691f, -0.100741356611f), make_float3(-0.029442556202f, -0.086612440646, 1.205112814903f))
 #define matrix_egamut_to_xyz make_float3x3(make_float3(0.705396831036f, 0.164041340351f, 0.081017754972f), make_float3(0.280130714178f, 0.820206701756f, -0.100337378681f), make_float3(-0.103781513870f, -0.072907261550, 1.265746593475f))
 #define matrix_davinciwg_to_xyz make_float3x3(make_float3(0.700622320175f, 0.148774802685f, 0.101058728993f), make_float3(0.274118483067f, 0.873631775379f, -0.147750422359f), make_float3(-0.098962903023f, -0.137895315886, 1.325916051865f))
+#define matrix_canoncinegamut_to_xyz make_float3x3(make_float3(0.716049646552f, 0.129683477876f, 0.104722802624f), make_float3(0.261261357526f, 0.869642145755f, -0.130903503281f), make_float3(-0.00967634657502f, -0.236481636126f, 1.33521573346f))
 
 #define matrix_xyz_to_rec709 make_float3x3(make_float3(3.2409699419f, -1.53738317757f, -0.498610760293f), make_float3(-0.969243636281f, 1.87596750151f, 0.041555057407f), make_float3(0.055630079697f, -0.203976958889f, 1.05697151424f))
 #define matrix_xyz_to_p3d65 make_float3x3(make_float3(2.49349691194f, -0.931383617919f, -0.402710784451f), make_float3(-0.829488969562f, 1.76266406032f, 0.023624685842f), make_float3(0.035845830244f, -0.076172389268f, 0.956884524008f))
@@ -311,6 +311,7 @@ __DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p
   else if (in_gamut == i_sgamut3) in_to_xyz = matrix_sonysgamut3_to_xyz;
   else if (in_gamut == i_sgamut3cine) in_to_xyz = matrix_sonysgamut3cine_to_xyz;
   else if (in_gamut == i_bmdwg) in_to_xyz = matrix_bmdwg_to_xyz;
+  else if (in_gamut == i_cinegamut) in_to_xyz = matrix_canoncinegamut_to_xyz;
   else if (in_gamut == i_egamut) in_to_xyz = matrix_egamut_to_xyz;
   else if (in_gamut == i_davinciwg) in_to_xyz = matrix_davinciwg_to_xyz;
   
